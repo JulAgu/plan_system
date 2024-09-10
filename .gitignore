@@ -1,2 +1,8 @@
 # src directory
 src/
+# build directory
+main/build/
+# dist directory
+main/dist/
+# python cache
+main/__pycache__/
