@@ -2,7 +2,7 @@
 Systéme pour construire un plan global des essais expérimentals. Une application pour integrer et transformer de maniére dynamique des fichiers issus de R-expé.
 
 # Setup
-Je recommande d'utiliser un environnement contenant les dépendances suivantes
+Je recommande d'utiliser un environnement contenant les dépendances suivantes : 
 
 **python 3.11.9**
 ```
