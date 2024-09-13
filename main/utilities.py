@@ -50,6 +50,7 @@ class Essai(object):
         data = pd.read_excel(self.pathData, sheet_name="Données_1")
         corr = pd.read_excel(self.pathData, sheet_name="Correspondance")
         config = pd.read_excel(self.configPath)
+        config.drop_duplicates(subset="Variété", keep="first", inplace=True)
         self.descriptionData = corr.loc[:, ["Nom Variété", "Numéro de correspondance"]]
         self.descriptionData = self.descriptionData.rename(
             columns={"Nom Variété": "VARIETES", "Numéro de correspondance": "N"}
