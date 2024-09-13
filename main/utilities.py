@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import xlsxwriter
 import openpyxl
 from openpyxl.styles import PatternFill
+from itertools import combinations
 
 
 class Microparcelle(object):
@@ -877,68 +878,42 @@ def creerEssais(srcPath, pathListe):
 def orchesterPlan(listeEssais):
     """
     Orchestre le plan en balançant les essais sur la base de sa longueur.
-    Utilise une méthode de programmation dynamique pour trouver la meilleure combinaison.
-    Cette méthode est une implémentation pour résoudre le "problème de partitionnement".
+    Utilise la force brute pour trouver la meilleure combinaison.
     """
-
-    firstG = listeEssais[0] # This variables are not needed but useful to follow the logic, that's why i save them
-    firstD = listeEssais[1] # This variables are not needed but useful to follow the logic, that's why i save them
-    listeEssais = listeEssais[2:]
 
     n = len(listeEssais)
     total_sum = sum(listeEssais)
-    target = total_sum // 2
+    
+    best_diff = float('inf')  # Initialize with a very large number
+    best_partition = None
 
-    # Garde les indices des éléments de listeEssais
-    indices = list(
-        range(2, len(listeEssais) + 2)
-    )  # les indices réels des éléments dans la liste d'origine
+    indices = list(range(2, n))  # List of indices, excluding the first two elements
 
-    # Initialiser la table de programmation dynamique
-    dp = [[False] * (target + 1) for _ in range(n + 1)]
+    # Try all possible subsets of the remaining indices
+    for i in range(len(indices) + 1):  # For each possible size of the subset
+        for subset_indices in combinations(indices, i):
+            subset1_indices = [0] + list(subset_indices)  # Ensure index 0 is in subset1
+            subset2_indices = [1] + list(set(indices) - set(subset_indices))  # Ensure index 1 is in subset2
 
-    # Cas de base (première colonne de la table DP)
-    for i in range(n + 1):
-        dp[i][0] = True
+            subset1_sum = sum(listeEssais[idx] for idx in subset1_indices)
+            subset2_sum = sum(listeEssais[idx] for idx in subset2_indices)
+            diff = abs(subset1_sum - subset2_sum)  # Calculate the difference in sums
 
-    # Remplir la table DP
-    for i in range(1, n + 1):
-        for j in range(1, target + 1):
-            if listeEssais[i - 1] <= j:
-                dp[i][j] = dp[i - 1][j] or dp[i - 1][j - listeEssais[i - 1]]
-            else:
-                dp[i][j] = dp[i - 1][j]
+            # Update the best partition if the difference is smaller
+            if diff < best_diff:
+                best_diff = diff
+                best_partition = (subset1_indices, subset2_indices)
+            # If the difference is the same but subset1 is smaller than subset2, ensure subset1 is larger
+            elif diff == best_diff:
+                if len(subset1_indices) < len(subset2_indices):
+                    best_partition = (subset2_indices, subset1_indices)
+                    
+    # Return the partition ensuring subset1 is the larger one if unequal in size
+    subset1_indices, subset2_indices = best_partition
+    if len(subset1_indices) < len(subset2_indices):
+        subset1_indices, subset2_indices = subset2_indices, subset1_indices
 
-    # Trouver la valeur la plus grande possible pour la somme d'un sous-ensemble
-    subset_sum = 0
-    for j in range(target, -1, -1):
-        if dp[n][j]:
-            subset_sum = j
-            break
-
-    # Reconstruire les sous-ensembles d'indices
-    subset1 = []
-    subset2 = []
-    w = subset_sum
-    for i in range(n, 0, -1):
-        if dp[i][w] and not dp[i - 1][w]:
-            subset1.append(indices[i - 1])  # ajoute l'indice au lieu de l'élément
-            w -= listeEssais[i - 1]
-        else:
-            subset2.append(indices[i - 1])  # ajoute l'indice au lieu de l'élément
-
-    # Ajoute les indices de firstG et firstD
-    if sum(listeEssais[idx - 2] for idx in subset1) >= sum(
-        listeEssais[idx - 2] for idx in subset2
-    ):
-        subset1.insert(0, 0)  # l'indice de firstG est 0
-        subset2.insert(0, 1)  # l'indice de firstD est 1
-        return subset1, subset2
-    else:
-        subset2.insert(0, 0)  # l'indice de firstG est 0
-        subset1.insert(0, 1)  # l'indice de firstD est 1
-        return subset2, subset1
-
+    return subset1_indices, subset2_indices
 
 def backendWrapper4Blocs(srcPath):
     """
@@ -980,7 +955,6 @@ def backendWrapper2Blocs(srcPath):
         docs.remove("config.xlsx")
     except:
         raise ValueError("Le fichier de configuration est introuvable")
-    docs.remove("config.xlsx")
     docs.remove("Gamme.xlsx")
     docs.insert(0, "Gamme.xlsx")
     essais = creerEssais(srcPath, docs)

@@ -6,3 +6,5 @@ main/build/
 main/dist/
 # python cache
 main/__pycache__/
+# archive
+archive/
