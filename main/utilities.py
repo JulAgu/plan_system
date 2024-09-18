@@ -904,15 +904,11 @@ def orchesterPlan(listeEssais):
             if diff < best_diff:
                 best_diff = diff
                 best_partition = (subset1_indices, subset2_indices)
-            # If the difference is the same but subset1 is smaller than subset2, ensure subset1 is larger
-            elif diff == best_diff:
-                if len(subset1_indices) < len(subset2_indices):
-                    best_partition = (subset2_indices, subset1_indices)
-                    
-    # Return the partition ensuring subset1 is the larger one if unequal in size
+
     subset1_indices, subset2_indices = best_partition
-    if len(subset1_indices) < len(subset2_indices):
-        subset1_indices, subset2_indices = subset2_indices, subset1_indices
+
+    if sum(listeEssais[idx] for idx in subset2_indices) > sum(listeEssais[idx] for idx in subset1_indices) :
+        subset1_indices, subset2_indices = subset2_indices, subset2_indices
 
     return subset1_indices, subset2_indices
 
