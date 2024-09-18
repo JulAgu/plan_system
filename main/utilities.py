@@ -908,9 +908,9 @@ def orchesterPlan(listeEssais):
     subset1_indices, subset2_indices = best_partition
 
     if sum(listeEssais[idx] for idx in subset2_indices) > sum(listeEssais[idx] for idx in subset1_indices) :
-        subset1_indices, subset2_indices = subset2_indices, subset2_indices
-
-    return subset1_indices, subset2_indices
+        return subset2_indices, subset1_indices
+    else:
+        return subset1_indices, subset2_indices
 
 def backendWrapper4Blocs(srcPath):
     """

@@ -7,11 +7,9 @@ from utilities import *
 if __name__ == "__main__":
 
     def plan4Blocs():
-        essais, essaisMatricesList, gaucheIndex, droiteIndex = backendWrapper4Blocs(
-            dirname
-        )
 
         if typePlanValue.get() == "8 blocs":
+            essais, essaisMatricesList, gaucheIndex, droiteIndex = backendWrapper4Blocs(dirname)
             dibujante = Dessinateur4blocs(
                 dirname + nomPlanValue.get(),
                 essais,
@@ -21,6 +19,7 @@ if __name__ == "__main__":
             )
 
         else:
+            essais, essaisMatricesList = backendWrapper2Blocs(dirname)
             dibujante = Dessinateur2blocs(
                 dirname + nomPlanValue.get(),
                 essais,
