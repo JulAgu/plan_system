@@ -689,7 +689,9 @@ class Dessinateur2blocs(Dessinateur4blocs):
                 .to_numpy()
                 .flatten()
             )
-            parcelle = matrice.flatten()
+            matrice = pd.DataFrame(matrice)
+            matrice = matrice[matrice.columns[::-1]]
+            parcelle = matrice.to_numpy().flatten()
             newEtiquetets = pd.DataFrame(
                 {"Position": position, "Parcelle": parcelle, "Essai": essai.nom}
             )
