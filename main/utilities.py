@@ -308,7 +308,6 @@ class Dessinateur4blocs(object):
             )
 
         # LookUp pour les densités grace au pave de la feuille Calcul
-
         for i in range(3, len(self.dfGauche) + 3):
             self.worksheet.write_formula(
                 f"H{i}",
@@ -320,6 +319,20 @@ class Dessinateur4blocs(object):
             self.worksheet.write_formula(
                 f"AI{i}",
                 f"=XLOOKUP(AC{i},Calcul!E4:E10,Calcul!F4:F10,0)",
+                self.simpleCellFormat,
+            )
+        # LookUp pour les PMGs qui s'actualisent en temps reél
+        for i in range(3, len(self.dfGauche) + 3):
+            self.worksheet.write_formula(
+                f"G{i}",
+                f"=XLOOKUP(A{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B147,'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D147,0)",
+                self.simpleCellFormat,
+            )
+        
+        for i in range(3, len(self.dfGauche) + 3):
+            self.worksheet.write_formula(
+                f"AH{i}",
+                f"=XLOOKUP(AB{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B147,'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D147,0)",
                 self.simpleCellFormat,
             )
 
@@ -559,7 +572,6 @@ class Dessinateur4blocs(object):
                 ):
                     sheet.cell(row=i, column=k).fill = colorsRight[color]
             row = row + modas
-        print(colIniBordure)
 
         # Mettre les bordures grises dans le plan
         planCol = self.ppInitialCol + 1
@@ -582,6 +594,7 @@ class Dessinateur4blocs(object):
                 sheet.cell(row=i, column=j).fill = gray_fill
 
         wb.save(self.nomDuPlan + ".xlsx")
+        print("Plan généré avec succès")
 
 
 class Dessinateur2blocs(Dessinateur4blocs):
@@ -673,6 +686,14 @@ class Dessinateur2blocs(Dessinateur4blocs):
             self.worksheet.write_formula(
                 f"H{i}",
                 f"=XLOOKUP(B{i},Calcul!E4:E10,Calcul!F4:F10,0)",
+                self.simpleCellFormat,
+            )
+        
+        # LookUp pour les PMGs qui s'actualisent en temps reél
+        for i in range(3, len(self.dfEssais) + 3):
+            self.worksheet.write_formula(
+                f"G{i}",
+                f"=XLOOKUP(A{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B147,'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D147,0)",
                 self.simpleCellFormat,
             )
 
@@ -855,6 +876,7 @@ class Dessinateur2blocs(Dessinateur4blocs):
                 sheet.cell(row=i, column=j).fill = gray_fill
 
         wb.save(self.nomDuPlan + ".xlsx")
+        print("Plan généré avec succès")
 
 
 def lineToMicroparcelle(row):
@@ -869,7 +891,7 @@ def lineToMicroparcelle(row):
 
 def creerEssais(srcPath, pathListe):
     essais = [
-        Essai(path[:-5], 0, srcPath + path, srcPath + "config.xlsx")
+        Essai(path[:-5], 0, srcPath + path, "config.xlsx")
         for path in pathListe
     ]
     for essai in essais:
@@ -914,6 +936,7 @@ def orchesterPlan(listeEssais):
     else:
         return subset1_indices, subset2_indices
 
+
 def backendWrapper4Blocs(srcPath):
     """
     Une fonction qui relie toutes les actions nécessaires
@@ -923,10 +946,6 @@ def backendWrapper4Blocs(srcPath):
     os.makedirs(srcPath + "results", exist_ok=True)
     docs = os.listdir(srcPath)
     docs = [doc for doc in docs if doc.endswith(".xlsx")]
-    try:
-        docs.remove("config.xlsx")
-    except:
-        raise ValueError("Le fichier de configuration est introuvable")
     docs.remove("Gamme.xlsx")
     docs.remove("bt2.xlsx")
     docs.insert(0, "bt2.xlsx")
@@ -950,10 +969,6 @@ def backendWrapper2Blocs(srcPath):
     os.makedirs(srcPath + "results", exist_ok=True)
     docs = os.listdir(srcPath)
     docs = [doc for doc in docs if doc.endswith(".xlsx")]
-    try:
-        docs.remove("config.xlsx")
-    except:
-        raise ValueError("Le fichier de configuration est introuvable")
     docs.remove("Gamme.xlsx")
     docs.insert(0, "Gamme.xlsx")
     essais = creerEssais(srcPath, docs)

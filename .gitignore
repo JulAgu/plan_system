@@ -8,3 +8,5 @@ main/dist/
 main/__pycache__/
 # archive
 archive/
+# ignore the config file in the root directory
+config.xlsx
