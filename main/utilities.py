@@ -6,7 +6,10 @@ import xlsxwriter
 import openpyxl
 from openpyxl.styles import PatternFill
 from itertools import combinations
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
+CONFIG_NAME = "config.xlsx"
 
 class Microparcelle(object):
     """
@@ -293,6 +296,8 @@ class Dessinateur4blocs(object):
         """
         Integre les formules mathematiques pour le calcul des poids des sacs
         """
+        lenConfig = len(pd.read_excel(CONFIG_NAME))+1
+
         for i in range(len(self.dfGauche)):
             self.worksheet.write_formula(
                 f"F{3+i}",
@@ -325,14 +330,14 @@ class Dessinateur4blocs(object):
         for i in range(3, len(self.dfGauche) + 3):
             self.worksheet.write_formula(
                 f"G{i}",
-                f"=XLOOKUP(A{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B147,'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D147,0)",
+                f"=XLOOKUP(A{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B{lenConfig},'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D{lenConfig},0)",
                 self.simpleCellFormat,
             )
         
         for i in range(3, len(self.dfGauche) + 3):
             self.worksheet.write_formula(
                 f"AH{i}",
-                f"=XLOOKUP(AB{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B147,'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D147,0)",
+                f"=XLOOKUP(AB{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B{lenConfig},'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D{lenConfig},0)",
                 self.simpleCellFormat,
             )
 
@@ -594,7 +599,7 @@ class Dessinateur4blocs(object):
                 sheet.cell(row=i, column=j).fill = gray_fill
 
         wb.save(self.nomDuPlan + ".xlsx")
-        print("Plan généré avec succès")
+        print("Plan généré avec succès :D")
 
 
 class Dessinateur2blocs(Dessinateur4blocs):
@@ -673,6 +678,9 @@ class Dessinateur2blocs(Dessinateur4blocs):
         """
         Integre les formules mathematiques pour le calcul des poids des sacs
         """
+
+        lenConfig = len(pd.read_excel(CONFIG_NAME))+1
+
         for i in range(len(self.dfEssais)):
             self.worksheet.write_formula(
                 f"F{3+i}",
@@ -693,7 +701,7 @@ class Dessinateur2blocs(Dessinateur4blocs):
         for i in range(3, len(self.dfEssais) + 3):
             self.worksheet.write_formula(
                 f"G{i}",
-                f"=XLOOKUP(A{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B147,'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D147,0)",
+                f"=XLOOKUP(A{i},'{os.getcwd()}\[config.xlsx]Feuil1'!B2:B{lenConfig},'{os.getcwd()}\[config.xlsx]Feuil1'!D2:D{lenConfig},0)",
                 self.simpleCellFormat,
             )
 
@@ -876,7 +884,7 @@ class Dessinateur2blocs(Dessinateur4blocs):
                 sheet.cell(row=i, column=j).fill = gray_fill
 
         wb.save(self.nomDuPlan + ".xlsx")
-        print("Plan généré avec succès")
+        print("Plan généré avec succès :D")
 
 
 def lineToMicroparcelle(row):
@@ -891,7 +899,7 @@ def lineToMicroparcelle(row):
 
 def creerEssais(srcPath, pathListe):
     essais = [
-        Essai(path[:-5], 0, srcPath + path, "config.xlsx")
+        Essai(path[:-5], 0, srcPath + path, CONFIG_NAME)
         for path in pathListe
     ]
     for essai in essais:
