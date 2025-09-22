@@ -938,6 +938,8 @@ def orchesterPlan(listeEssais):
                 best_partition = (subset1_indices, subset2_indices)
 
     subset1_indices, subset2_indices = best_partition
+    subset1_indices.sort()
+    subset2_indices.sort()
 
     if sum(listeEssais[idx] for idx in subset2_indices) > sum(listeEssais[idx] for idx in subset1_indices) :
         return subset2_indices, subset1_indices
